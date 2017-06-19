@@ -44,8 +44,7 @@ class GuzzleClient implements HttpClientInterface
      */
     public function request($method, $url, $content = null, array $headers = array(), array $options = array())
     {
-        try
-        {
+        try {
             $opts = [];
             if (null !== $content) {
                 $opts['body'] = $content;
@@ -65,9 +64,7 @@ class GuzzleClient implements HttpClientInterface
                 (string) $originalResponse->getBody(),
                 $originalResponse->getHeaders()
             );
-        }
-        catch(\Exception $e)
-        {
+        } catch(\Exception $e) {
             throw new HttpException($e);
         }
     }
