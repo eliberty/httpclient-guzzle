@@ -2,8 +2,12 @@
 
 namespace Payment\HttpClient;
 
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 
+/**
+ * Class GuzzleClient
+ * @package Payment\HttpClient
+ */
 class GuzzleClient implements HttpClientInterface
 {
     /**
@@ -22,8 +26,7 @@ class GuzzleClient implements HttpClientInterface
      */
     public function getClient()
     {
-        if(is_null($this->client))
-        {
+        if (null === $this->client) {
             $this->client = new Client();
         }
 
@@ -43,13 +46,24 @@ class GuzzleClient implements HttpClientInterface
     {
         try
         {
-            $originalResponse = $this->getClient()->createRequest($method, $url, $headers, $content)->send();
+            $opts = [];
+            if (null !== $content) {
+                $opts['body'] = $content;
+            }
+
+            if (count($headers)) {
+                $opts['headers'] = $headers;
+            }
+
+            $optsRequest = array_merge($opts, $options);
+
+            $originalResponse = $this->getClient()->request($method, $url, $optsRequest);
 
             return new NullResponse(
                 $originalResponse->getStatusCode(),
-                $originalResponse->getContentType(),
-                $originalResponse->getBody(true),
-                $originalResponse->getHeaders()->toArray()
+                $originalResponse->getHeader('Content-Type'),
+                (string) $originalResponse->getBody(),
+                $originalResponse->getHeaders()
             );
         }
         catch(\Exception $e)
